@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 # Carregar os dados do CSV
-file_path = "microdados_ed_basica_2023.csv"  # Certifique-se de que o caminho está correto
+file_path = "microdados_ed_basica_2023.csv"
 df = pd.read_csv(file_path, delimiter=";", encoding="latin1", low_memory=False)
 
 # Filtrar apenas os dados da Paraíba (UF = 'PB') e selecionar colunas específicas
