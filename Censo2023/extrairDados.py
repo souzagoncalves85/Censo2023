@@ -6,7 +6,7 @@ file_path = "microdados_ed_basica_2023.csv"  # Certifique-se de que o caminho es
 df = pd.read_csv(file_path, delimiter=";", encoding="latin1", low_memory=False)
 
 # Filtrar apenas os dados da Paraíba (UF = 'PB') e selecionar colunas específicas
-df_pb = df[df["SG_UF"] == "PB"][["NO_ENTIDADE", "SG_UF", "NO_MUNICIPIO", "NO_MESORREGIAO", "NO_MICRORREGIAO"]]
+df_pb = df[df["SG_UF"] == "PB"][["NO_ENTIDADE", "SG_UF", "NO_MUNICIPIO", "NO_MESORREGIAO", "NO_MICRORREGIAO", "QT_MAT_BAS"]]
 
 # Renomear colunas para melhor entendimento
 df_pb.rename(columns={
