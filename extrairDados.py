@@ -1,23 +1,39 @@
 import pandas as pd
+import json
 
-# Caminho do arquivo JSON
+# Caminho do arquivo JSON de entrada
 file_path = "censo_pb.json"
 
 # Carregar o arquivo JSON com linhas separadas
 df = pd.read_json(file_path, encoding="latin1", lines=True)
 
-# Renomear as colunas para algo mais amigável
-colunas_necessarias = {"Nome da Escola": "Nome da Escola", "QT_MAT_BAS": "Quantidade"}
-df = df[list(colunas_necessarias.keys())]
+# Selecionar e renomear as colunas desejadas
+colunas_necessarias = {
+    "NO_REGIAO": "regiao",
+    "NO_UF": "uf",
+    "NO_MUNICIPIO": "municipio",
+    "NO_MESORREGIAO": "mesorregiao",
+    "NO_MICRORREGIAO": "microrregiao",
+    "NO_ENTIDADE": "escola",
+    "QT_MAT_BAS": "quantidade"
+}
 
-# Renomear as colunas
-df.rename(columns=colunas_necessarias, inplace=True)
+# Filtrar as colunas desejadas e renomear
+df = df[list(colunas_necessarias.keys())].rename(columns=colunas_necessarias)
 
-# Tratar valores nulos (substituindo por 0)
-df["Quantidade"] = df["Quantidade"].fillna(0).astype(int)
+# Filtrar apenas registros da UF "PB"
+df = df[df["uf"] == "PB"]
 
-# Somar a quantidade de matrículas por escola
-matriculas_por_escola = df.groupby("Nome da Escola")["Quantidade"].sum().astype(int)
+# Tratar valores nulos na coluna "quantidade"
+df["quantidade"] = df["quantidade"].fillna(0).astype(int)
 
-# Exibir o resultado
-print(matriculas_por_escola)
+# Somar a quantidade de matrículas por escola dentro da Paraíba
+df = df.groupby(["regiao", "uf", "municipio", "mesorregiao", "microrregiao", "escola"], as_index=False)["quantidade"].sum()
+
+# Caminho do arquivo JSON de saída
+output_file = "censo_pb_formatado.json"
+
+# Salvar o resultado como JSON bem estruturado
+df.to_json(output_file, orient="records", indent=4, force_ascii=False)
+
+print(f"Arquivo JSON gerado com sucesso: {output_file}")
