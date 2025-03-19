@@ -1,16 +1,15 @@
 import pandas as pd
-import json
 
-# Caminho do arquivo JSON de entrada
-file_path = "censo_pb.json"
+# Caminho do arquivo CSV de entrada
+file_path = "microdados_ed_basica_2023.csv"
 
-# Carregar o arquivo JSON com linhas separadas
-df = pd.read_json(file_path, encoding="latin1", lines=True)
+# Carregar o arquivo CSV corretamente
+df = pd.read_csv(file_path, encoding="latin1", delimiter=";", low_memory=False)
 
 # Selecionar e renomear as colunas desejadas
 colunas_necessarias = {
     "NO_REGIAO": "regiao",
-    "NO_UF": "uf",
+    "SG_UF": "uf",
     "NO_MUNICIPIO": "municipio",
     "NO_MESORREGIAO": "mesorregiao",
     "NO_MICRORREGIAO": "microrregiao",
@@ -21,11 +20,16 @@ colunas_necessarias = {
 # Filtrar as colunas desejadas e renomear
 df = df[list(colunas_necessarias.keys())].rename(columns=colunas_necessarias)
 
-# Filtrar apenas registros da UF "PB"
+# Filtrar apenas registros do estado da Paraíba (SG_UF == "PB")
 df = df[df["uf"] == "PB"]
 
-# Tratar valores nulos na coluna "quantidade"
+# Tratar valores nulos na coluna "quantidade" e garantir que seja inteiro
 df["quantidade"] = df["quantidade"].fillna(0).astype(int)
+
+# Garantir que não há valores nulos em outras colunas essenciais
+df.fillna({"regiao": "Desconhecido", "municipio": "Desconhecido",
+           "mesorregiao": "Desconhecido", "microrregiao": "Desconhecido",
+           "escola": "Desconhecida"}, inplace=True)
 
 # Somar a quantidade de matrículas por escola dentro da Paraíba
 df = df.groupby(["regiao", "uf", "municipio", "mesorregiao", "microrregiao", "escola"], as_index=False)["quantidade"].sum()
